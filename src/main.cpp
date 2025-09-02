@@ -1,7 +1,7 @@
 #include <Keypad.h>             // facilita teclados 
 #include <LiquidCrystal_I2C.h>     
 
-LiquidCrystal_I2C lcd(0x27, 20, 4); // 16 colunas, 2 linhas
+LiquidCrystal_I2C lcd(0x27, 20, 4); // 20 colunas, 4 linhas
 
 // Variáveis para guardar os números que o usuário digita:
 long primeiroN = 0;       // Guarda o primeiro número antes do operador
@@ -23,20 +23,20 @@ char keys[LIN][COL] = {
   {'C','0','=','/'}    
 };
 
-// Define a que pinos do Arduino cada linha do teclado está conectada:
+// Define pinos que cada linha do teclado está conectada:
 byte rowPins[LIN] = {14, 27, 26, 25};  
-// Define a que pinos do Arduino cada coluna do teclado está conectada:
+// Define pinos que cada coluna do teclado está conectada:
 byte colPins[COL] = {33, 32, 18, 19};  
 
 // Cria o objeto que gerencia o teclado, passando o mapa, os pinos e as dimensões:
 Keypad _teclado = Keypad(makeKeymap(keys), rowPins, colPins, LIN, COL);
 
-long funcaoSegNum();
+long funcaoSegNum(); //Declara a função que vai ser usada
 
 void setup() {
-  lcd.init();                 // Inicializa o LCD I2C
-  lcd.backlight();            // Liga backlight (se disponível)
-  // Exibe uma mensagem de boas-vindas:
+  lcd.init();                
+  lcd.backlight();           
+  //Mensagem de boas-vindas:
   lcd.clear();
   lcd.setCursor(0, 0);       // Posiciona o “cursor” no canto superior esquerdo
   lcd.print("Calculadora");  
@@ -44,11 +44,11 @@ void setup() {
   lcd.print("Antonio Carlos");
   delay(4000);               // Mostra a mensagem por 4 segundos
   lcd.clear();               // Apaga a tela para começar limpo
-  lcd.setCursor(0, 0);       // Posiciona o “cursor” no canto superior esquerdo
+  lcd.setCursor(0, 0);       
   lcd.print("* = Limpar tela");  
   lcd.setCursor(0, 1);       // Vai para a segunda linha
   lcd.print("# = Sinal de Igual");
-  lcd.setCursor(0, 2);       // Posiciona o “cursor” no canto superior esquerdo
+  lcd.setCursor(0, 2);       
   lcd.print("A = Soma ");  
   delay(2000);               
   lcd.clear();
@@ -70,19 +70,22 @@ void loop() {
   // Decide o que fazer com base na tecla lida:
   switch (teclaPress) {
 
-    // Se for um dígito de '0' a '9', estamos construindo o primeiro número:
+    // Se for um dígito de '0' a '9', o primeiro número esta sendo escrito:
     case '0' ... '9':              
-      lcd.setCursor(0, 0);           
+      lcd.setCursor(0, 0); 
+      //#### Trecho que cronstroe casas decimais do primeiro numero #######          
       // primeiroN = primeiroN * 10 + valor da tecla
       // Ex.: se digitou '2' depois '3', primeiroN vira 2*10 + 3 = 23
       primeiroN = primeiroN * 10 + (teclaPress - '0');
       lcd.print(primeiroN);            // Mostra o número que está sendo digitado
       break;
 
-    // Se apertou '+', vamos somar:
+    // Se apertou '+', somar:
     case '+':
-      // Se já havia um resultado em total, usa-o como ponto de partida
-      primeiroN = (total != 0 ? total : primeiroN);
+      // Se já tinha um resultado em "total", usa como ponto de partida
+      if (total != 0) {
+        primeiroN = total;
+      }
       lcd.setCursor(0, 1);         // Vai para a linha de baixo
       lcd.print("+");              // Exibe o símbolo de adição
       segundoN = funcaoSegNum();     // Chama a função que lê o segundo número até '='
@@ -97,7 +100,9 @@ void loop() {
 
     // Mesma lógica para subtração, multiplicação e divisão:
     case '-':
-      primeiroN = (total != 0 ? total : primeiroN);
+      if (total != 0) {
+        primeiroN = total;
+      }
       lcd.setCursor(0, 1);
       lcd.print("-");
       segundoN = funcaoSegNum();
@@ -109,7 +114,9 @@ void loop() {
       break;
 
     case '*':
-      primeiroN = (total != 0 ? total : primeiroN);
+      if (total != 0) {
+        primeiroN = total;
+      }
       lcd.setCursor(0, 1);
       lcd.print("*");
       segundoN = funcaoSegNum();
@@ -121,7 +128,9 @@ void loop() {
       break;
 
     case '/':
-      primeiroN = (total != 0 ? total : primeiroN);
+      if (total != 0) {
+        primeiroN = total;
+      }
       lcd.setCursor(0, 1);
       lcd.print("/");
       segundoN = funcaoSegNum();
