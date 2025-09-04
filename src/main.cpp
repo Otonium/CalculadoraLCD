@@ -7,6 +7,7 @@ LiquidCrystal_I2C lcd(0x27, 20, 4); // 20 colunas, 4 linhas
 long primeiroN = 0;       // Guarda o primeiro número antes do operador
 long segundoN = 0;      // Guarda o segundo número depois do operador
 double total = 0;     // Guarda o resultado da operação (pode ter parte decimal)
+bool numNaTela = false; // Variavel para conferir se tem algo escrito na tela
 
 // Variável que armazena a tecla pressionada:
 char teclaPress;
@@ -67,19 +68,29 @@ void loop() {
   // Lê qual tecla foi pressionada (se nenhuma, teclaPress fica nulo):
   teclaPress = _teclado.getKey();
 
-  // Decide o que fazer com base na tecla lida:
-  switch (teclaPress) {
-
     // Se for um dígito de '0' a '9', o primeiro número esta sendo escrito:
-    case '0' ... '9':              
+    if (teclaPress >= '0' && teclaPress <= '9') {             
+      if (numNaTela)
+      {
+        lcd.clear();
+        primeiroN = 0;
+        segundoN = 0;
+        total = 0;
+        numNaTela = false;
+      }
+
       lcd.setCursor(0, 0); 
       //#### Trecho que cronstroe casas decimais do primeiro numero #######          
       // primeiroN = primeiroN * 10 + valor da tecla
       // Ex.: se digitou '2' depois '3', primeiroN vira 2*10 + 3 = 23
       primeiroN = primeiroN * 10 + (teclaPress - '0');
       lcd.print(primeiroN);            // Mostra o número que está sendo digitado
-      break;
+    }
 
+
+  // Decide o que fazer com base na tecla lida:
+  switch (teclaPress) {
+    
     // Se apertou '+', somar:
     case '+':
       // Se já tinha um resultado em "total", usa como ponto de partida
@@ -95,7 +106,7 @@ void loop() {
       lcd.print(total);            // Mostra o resultado
       primeiroN = 0;                   // Reseta para a próxima operação
       segundoN = 0;
-                        
+      numNaTela = true;                  
       break;
 
     // Mesma lógica para subtração, multiplicação e divisão:
@@ -110,7 +121,9 @@ void loop() {
       lcd.clear();
       lcd.setCursor(0, 0);
       lcd.print(total);
-      primeiroN = 0; segundoN = 0;
+      primeiroN = 0; 
+      segundoN = 0;
+      numNaTela = true;  
       break;
 
     case '*':
@@ -124,7 +137,9 @@ void loop() {
       lcd.clear();
       lcd.setCursor(0, 0);
       lcd.print(total);
-      primeiroN = 0; segundoN = 0;
+      primeiroN = 0; 
+      segundoN = 0;
+      numNaTela = true;  
       break;
 
     case '/':
@@ -143,7 +158,9 @@ void loop() {
         total = (double)primeiroN / (double)segundoN;
         lcd.print(total);
       }
-      primeiroN = 0; segundoN = 0;
+      primeiroN = 0; 
+      segundoN = 0;
+      numNaTela = true;  
       break;
 
     // 'C' limpa tudo:
@@ -153,10 +170,11 @@ void loop() {
       segundoN = 0;      // Zera o segundo número
       lcd.clear();     // Limpa a tela
       break;
-
     // Se apertar '=', poderia repetir a lógica de segundo número,
     // mas aqui o '=' só é tratado dentro de funcaoSegNum().
   }
+
+  
 }
 
 
